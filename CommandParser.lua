@@ -19,7 +19,12 @@ parser.tokenTypes = {
 	number = 3,
 }
 
-parser.tokenTypeNames
+parser.tokenTypeNames = {
+	[0] = "unknown",
+	[1] = "string",
+	[2] = "place",
+	[3] = "number",
+}
 
 --
 
