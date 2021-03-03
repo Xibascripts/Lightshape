@@ -7,7 +7,9 @@ parser.errors = {
 }
 
 parser.errorMessages = {
-	[1] = "Unfinished string starting at line %d",
+	[1] = "Unfinished string starting at char %d",
+	[2] = "Unfinished place definition starting at char %d",
+	[3] = "Malformed place definition at char %d",
 }
 
 parser.tokenTypes = {
@@ -16,6 +18,8 @@ parser.tokenTypes = {
 	place = 2,
 	number = 3,
 }
+
+parser.tokenTypeNames
 
 --
 
@@ -65,7 +69,7 @@ function parser:parse(text)
 			elseif (v == "[" or v == "]" or v == "," or v == ":") and not inString then
 				if v == "[" then -- start placeDefinition
 					-- Check for error
-					if inPlaceDef then return self.errors.malformedPlaceDefinition end
+					if inPlaceDef then return self.errors.malformedPlaceDefinition, placeDef.starting end
 					
 					-- End
 					table.insert(tokens, {}) -- Make so tokens insert to this new table
@@ -77,11 +81,11 @@ function parser:parse(text)
 					end
 					
 					-- Check for error
-					if not placeDefining then return self.errors.malformedPlaceDefinition end
+					if not placeDefining then return self.errors.malformedPlaceDefinition, placeDef.starting end
 					
 					-- Get val to define to var
 					local vals = tokens[#tokens]
-					if #vals > 1 then return self.errors.malformedPlaceDefinition end
+					if #vals > 1 then return self.errors.malformedPlaceDefinition, placeDef.starting end
 					val = vals[1]
 					
 					-- Define
@@ -101,7 +105,7 @@ function parser:parse(text)
 					
 					-- Gets var to def
 					local vars = tokens[#tokens]
-					if #vars > 1 then return self.errors.malformedPlaceDefinition end
+					if #vars > 1 then return self.errors.malformedPlaceDefinition, placeDef.starting end
 					var = vars[1]
 					
 					-- Make so it starts defining it
@@ -111,7 +115,7 @@ function parser:parse(text)
 					table.remove(tokens[#tokens], 1)
 				else -- end placeDefinition
 					-- Check for errors
-					if #tokens[#tokens] ~= 0 then return self.errors.malformedPlaceDefinition end
+					if #tokens[#tokens] ~= 0 then return self.errors.malformedPlaceDefinition, placeDef.starting end
 					
 					-- End placeDef
 					table.remove(tokens, #tokens)
